@@ -108,15 +108,15 @@
                   showView('promptVoting_view');
                   var all_views = document.querySelectorAll('.vote-button');
                   console.log(all_views);
-                  for(var x = 9; x > data.np; x--)
+                  for(var x = 8; x >= data.np; x--)
                   {
-                      document.getElementById(all_views[x]).hidden = true;
+                      all_views[x].className += " hidden";
                       console.log(all_views[x]);
                       console.log(x);
                   }
                   for(var j = 0; j < data.np; j++)
                   {
-                      document.getElementById(all_views[j]).hidden = false;
+                      all_views[j].hidden = false;
                       document.getElementById("votebutton" + j).className = "vote-button";
                       document.getElementById("votebutton" + j).innerHTML = data.ans[j];
                       console.log("votebutton" + j);
