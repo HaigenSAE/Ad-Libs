@@ -118,7 +118,7 @@ public class GameLogic : MonoBehaviour
         object stuffToSend = new
         {
             title = "VotingTime",
-            nP = numPlayers,
+            np = numPlayers,
             ans = answers
         };
         AirConsole.instance.Broadcast(stuffToSend);
