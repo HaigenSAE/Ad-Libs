@@ -1,216 +1,213 @@
-
 <html>
-<head>
-  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.7.0.js"></script>
-  <style type=text/css>
-  /* the style sheet dictates what our elements (buttons, backgrounds etc.) will look like. */
-      .view {
-          text-align: center;
-          display: block;
-          visibility: visible;
-          color: white;
-          font-size: x-large;
-          background-size: contain;
-          background-repeat: no-repeat;
-      }
-      .hidden {
-          display: none;
-          visibility: hidden;
-      }
-  #interact-button{
-      text-align: center;
-      background-image: url("submit_button.png");
-      position: absolute;
-      top: 40%;
-      left: 10%;
-      width: 80%;
-      height: 60%;
-      background-size: contain;
-      background-repeat: no-repeat;
-  }
-      #start-button {
-          text-align: center;
-          background-image: url("start_button.png");
-          position: absolute;
-          top: 40%;
-          left: 10%;
-          width: 80%;
-          height: 60%;
-          background-size: contain;
-          background-repeat: no-repeat;
-      }
-      .vote-button {
-          align-content: center;
-          display: block;
-          text-align: center;
-          background: url(vote_button.png);
-          background-position: center;
-          background-size: contain;
-          width: 50%;
-          height: 10%;
-          background-repeat: no-repeat;
-          padding: 2px 0px;
-          white-space: normal;
-          word-wrap: break-word;
-      }
-      .btn-group button {
-          background-color: #4CAF50; /* Green background */
-          border: 1px solid green; /* Green border */
-          color: white; /* White text */
-          padding: 10px 24px; /* Some padding */
-          cursor: pointer; /* Pointer/hand icon */
-          width: 50%; /* Set a width if needed */
-          display: block; /* Make the buttons appear below each other */
-      }
-      #prompt {
-          text-align: center;
-          color: white;
-          font-size: x-large;
-          background-size: contain;
-          background-repeat: no-repeat;
-      }
-  
-  </style>
-  
-  <script type="text/javascript">
-
-      var airconsole;
-      var currentPrompt;
-      
-      function App()
-      {
-          /* JavaScript / Functionality. Add functions and events here */ 
-          this.airconsole = new AirConsole({ "orientation": "portrait" });
-          this.airconsole.onMessage = function (from, data) {
-              console.log(data);
-              if (data == "AnswersLocked")
-              {
-                  showView('pleaseWait_view');
-              }
-              else if(data == "AllAnswersDone")
-              {
-                  showView('promptVoting_view')
-              }
-              else if(data == "ShowStartButton")
-              {
-                  showView('VIPStart_view')
-              }
-              else if(data == "StartGame")
-              {
-                  console.log("onMessage", from, data);
-                  showView('promptAnswering_view');
-                  
-              }
-              else if(data.title == "VotingTime")
-              {
-                  console.log("Setting up voting stuff");
-                  showView('promptVoting_view');
-                  var all_views = document.querySelectorAll('.vote-button');
-                  console.log(all_views);
-                  for(var x = 8; x >= data.np; x--)
-                  {
-                      all_views[x].className += " hidden";
-                      console.log(all_views[x]);
-                      console.log(x);
-                  }
-                  for(var j = 0; j < data.np; j++)
-                  {
-                      all_views[j].hidden = false;
-                      document.getElementById("votebutton" + j).className = "vote-button";
-                      document.getElementById("votebutton" + j).innerHTML = data.ans[j];
-                      console.log("votebutton" + j);
-                  }
-                  console.log("im a big dumb");
-
-              }
-              else
-              {
-                  currentPrompt = data;
-                  document.getElementById("prompt").innerHTML = data;
-                  document.getElementById("content").innerHTML = "device " + from + " says: " + data;
-              }
-          };
-
-          var showView = function (id) {
-          var view = document.getElementById(id);
-          var all_views = document.querySelectorAll('.view');
-          for (var i = 0; i < all_views.length; i++)
-          {
-              all_views[i].className += " hidden";
-          }
-
-          view.className = "view";
-      };
-          showView('waitingForPlayers_view');
-        /*
-         * Here we are adding support for mouse events manually.
-         * --> WE STRONGLY ENCOURAGE YOU TO USE THE AIRCONSOLE CONTROLS LIBRARY
-         * WHICH IS EVEN BETTER (BUT WE DONT WANT TO BLOAT THE CODE HERE).
-         * https://github.com/AirConsole/airconsole-controls/
-         * 
-         * DO NOT USE ONCLICK HANDLERS.
-         * THEY ADD A 200MS DELAY!
-         */
-         if (!("ontouchstart" in document.createElement("div")))
-         {
-          var elements = document.getElementsByTagName("*");
-          for (var i = 0; i < elements.length; ++i)
-          {
-            var element = elements[i];
-            var ontouchstart = element.getAttribute("ontouchstart");
-            if (ontouchstart)
-            {
-              element.setAttribute("onmousedown", ontouchstart);
+    <head>
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+        <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.7.0.js"></script>
+        <style type=text/css>
+            /* the style sheet dictates what our elements (buttons, backgrounds etc.) will look like. */
+            .view {
+                text-align: center;
+                display: block;
+                visibility: visible;
+                color: white;
+                font-size: x-large;
+                background-size: contain;
+                background-repeat: no-repeat;
             }
-            var ontouchend = element.getAttribute("ontouchend");
-            if (ontouchend)
-            {
-              element.setAttribute("onmouseup", ontouchend);
+            .hidden {
+                display: none;
+                visibility: hidden;
             }
-          }
-        }
-      }
-      App.prototype.sendMessageToScreen = function(type, msg)
-      {
-          if (type == "action")
-          {
-              console.log("button press");
-              this.airconsole.message(AirConsole.SCREEN, { action: msg });
-          }
-          else if(type == "result")
-          {
-              this.airconsole.message(AirConsole.SCREEN, { result: msg });
-          }
-          else if(type == "start")
-          {
-              this.airconsole.message(AirConsole.SCREEN, { start: msg });
-          }
-      };
+            #interact-button{
+                text-align: center;
+                background-image: url("submit_button.png");
+                position: absolute;
+                top: 40%;
+                left: 10%;
+                width: 80%;
+                height: 60%;
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+            #start-button {
+                text-align: center;
+                background-image: url("start_button.png");
+                position: absolute;
+                top: 40%;
+                left: 10%;
+                width: 80%;
+                height: 60%;
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+            .vote-button {
+                align-content: center;
+                display: block;
+                text-align: center;
+                background: url(vote_button.png);
+                background-position: center;
+                background-size: contain;
+                width: 50%;
+                height: 10%;
+                background-repeat: no-repeat;
+                padding: 2px 0px;
+                white-space: normal;
+                word-wrap: break-word;
+            }
+            .btn-group button {
+                background-color: #4CAF50; /* Green background */
+                border: 1px solid green; /* Green border */
+                color: white; /* White text */
+                padding: 10px 24px; /* Some padding */
+                cursor: pointer; /* Pointer/hand icon */
+                width: 50%; /* Set a width if needed */
+                display: block; /* Make the buttons appear below each other */
+            }
+            #prompt {
+                text-align: center;
+                color: white;
+                font-size: x-large;
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+        </style>
+        <script type="text/javascript">
 
+            var airconsole;
+            var currentPrompt;
+              
+            function App()
+            {
+                /* JavaScript / Functionality. Add functions and events here */ 
+                this.airconsole = new AirConsole({ "orientation": "portrait" });
+                this.airconsole.onMessage = function (from, data)
+                {
+                    console.log(data);
+                    if (data == "AnswersLocked")
+                    {
+                        showView('pleaseWait_view');
+                    }
+                    else if(data == "AllAnswersDone")
+                    {
+                        showView('promptVoting_view')
+                    }
+                    else if(data == "ShowStartButton")
+                    {
+                        showView('VIPStart_view')
+                    }
+                    else if(data == "StartGame")
+                    {
+                        console.log("onMessage", from, data);
+                        showView('promptAnswering_view');
+                        
+                    }
+                    else if(data.title == "VotingTime")
+                    {
+                        console.log("Setting up voting stuff");
+                        showView('promptVoting_view');
+                        var all_views = document.querySelectorAll('.vote-button');
+                        console.log(all_views);
+                        for(var x = 8; x >= data.np; x--)
+                        {
+                            all_views[x].className += " hidden";
+                            console.log(all_views[x]);
+                            console.log(x);
+                        }
+                        for(var j = 0; j < data.np; j++)
+                        {
+                            all_views[j].hidden = false;
+                            document.getElementById("votebutton" + j).className = "vote-button";
+                            document.getElementById("votebutton" + j).innerHTML = data.ans[j];
+                            console.log("votebutton" + j);
+                        }
+                        console.log("im a big dumb");
+        
+                    }
+                    else
+                    {
+                        currentPrompt = data;
+                        document.getElementById("prompt").innerHTML = data;
+                        document.getElementById("content").innerHTML = "device " + from + " says: " + data;
+                    }
+                };
+        
+                var showView = function (id)
+                {
+                    var view = document.getElementById(id);
+                    var all_views = document.querySelectorAll('.view');
+                    for (var i = 0; i < all_views.length; i++)
+                    {
+                        all_views[i].className += " hidden";
+                    }
+                    view.className = "view";
+                };
 
-  </script>
-</head>
-<body onload="window.app = new App()">
-    <!-- Add your HTML elements here -->
-    <div id="waitingForPlayers_view" class="view">Waiting for players...</div>
-    <div id="VIPStart_view" class="view">
-        <div id="start-button" value="Start" ontouchStart="window.app.sendMessageToScreen('start', 'begin')">Start Game!</div>
-    </div>
-    <div id="pleaseWait_view" class="view">Please Wait...</div>
-    <div id="promptAnswering_view" class="view">
-        <p>
-            <br>
-            <br>
-            <div id="prompt">
-            </div>
-        </p>
-        <form>
-            <input type="text" id="answer" placeholder="Your Answer...">
-            <div id="interact-button" value="Submit" ontouchStart="window.app.sendMessageToScreen('result', answer.value)"></div>
-        </form>
-    </div>
-    <div id="promptVoting_view" class="view">
+                showView('waitingForPlayers_view');
+              /*
+               * Here we are adding support for mouse events manually.
+               * --> WE STRONGLY ENCOURAGE YOU TO USE THE AIRCONSOLE CONTROLS LIBRARY
+               * WHICH IS EVEN BETTER (BUT WE DONT WANT TO BLOAT THE CODE HERE).
+               * https://github.com/AirConsole/airconsole-controls/
+               * 
+               * DO NOT USE ONCLICK HANDLERS.
+               * THEY ADD A 200MS DELAY!
+               */
+                if (!("ontouchstart" in document.createElement("div")))
+                {
+                    var elements = document.getElementsByTagName("*");
+                    for (var i = 0; i < elements.length; ++i)
+                    {
+                        var element = elements[i];
+                        var ontouchstart = element.getAttribute("ontouchstart");
+                        if (ontouchstart)
+                        {
+                            element.setAttribute("onmousedown", ontouchstart);
+                        }
+                        var ontouchend = element.getAttribute("ontouchend");
+                        if (ontouchend)
+                        {
+                            element.setAttribute("onmouseup", ontouchend);
+                        }
+                    }
+                } 
+            }
+            App.prototype.sendMessageToScreen = function(type, msg)
+            {
+                if (type == "action")
+                {
+                    console.log("button press");
+                    this.airconsole.message(AirConsole.SCREEN, { action: msg });
+                }
+                else if(type == "result")
+                {
+                    this.airconsole.message(AirConsole.SCREEN, { result: msg });
+                }
+                else if(type == "start")
+                {
+                    this.airconsole.message(AirConsole.SCREEN, { start: msg });
+                }
+            };
+          </script>
+    </head>
+    <body onload="window.app = new App()">
+        <!-- Add your HTML elements here -->
+        <div id="waitingForPlayers_view" class="view">Waiting for players...</div>
+        <div id="VIPStart_view" class="view">
+            <div id="start-button" value="Start" ontouchStart="window.app.sendMessageToScreen('start', 'begin')">Start Game!</div>
+        </div>
+        <div id="pleaseWait_view" class="view">Please Wait...</div>
+        <div id="promptAnswering_view" class="view">
+            <p>
+                <br>
+                <br>
+                <div id="prompt">
+                </div>
+            </p>
+            <form>
+                <input type="text" id="answer" placeholder="Your Answer...">
+                <div id="interact-button" value="Submit" ontouchStart="window.app.sendMessageToScreen('result', answer.value)"></div>
+            </form>
+        </div>
+        <div id="promptVoting_view" class="view">
             <!-- Add button for each prompt -->
             <div id="votebutton0" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 0)"></div>
             <div id="votebutton1" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 1)"></div>
@@ -221,7 +218,6 @@
             <div id="votebutton6" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 6)"></div>
             <div id="votebutton7" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 7)"></div>
             <div id="votebutton8" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 8)"></div>
-    </div>
-    
-</body>
+        </div>       
+    </body>
 </html>
