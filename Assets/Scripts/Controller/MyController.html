@@ -105,9 +105,10 @@
                         console.log("Setting up voting stuff");
                         showView('promptVoting_view');
                         var all_views = document.querySelectorAll('.vote-button');
-                        console.log(all_views);
                         for(var x = 8; x >= data.np; x--)
                         {
+                            all_views[x].hidden = true;
+                            all_views[x].innerHTML = "";
                             all_views[x].className += " hidden";
                             console.log(all_views[x]);
                             console.log(x);
@@ -119,7 +120,6 @@
                             document.getElementById("votebutton" + j).innerHTML = data.ans[j];
                             console.log("votebutton" + j);
                         }
-                        console.log("im a big dumb");
         
                     }
                     else
@@ -134,9 +134,15 @@
                 {
                     var view = document.getElementById(id);
                     var all_views = document.querySelectorAll('.view');
+                    var button_views = document.querySelectorAll('.vote-button');
                     for (var i = 0; i < all_views.length; i++)
                     {
                         all_views[i].className += " hidden";
+                    }
+                    for (var i = 0; i < button_views.length; i++)
+                    {
+                        button_views[i].hidden = true;
+                        button_views[i].className += " hidden";
                     }
                     view.className = "view";
                 };
@@ -185,6 +191,11 @@
                 {
                     this.airconsole.message(AirConsole.SCREEN, { start: msg });
                 }
+                else if(type == "vote")
+                {
+                    this.airconsole.message(AirConsole.SCREEN, { vote: msg }); 
+                    showView('pleaseWait_view');
+                }
             };
           </script>
     </head>
@@ -209,15 +220,15 @@
         </div>
         <div id="promptVoting_view" class="view">
             <!-- Add button for each prompt -->
-            <div id="votebutton0" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 0)"></div>
-            <div id="votebutton1" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 1)"></div>
-            <div id="votebutton2" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 2)"></div>
-            <div id="votebutton3" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 3)"></div>
-            <div id="votebutton4" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 4)"></div>
-            <div id="votebutton5" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 5)"></div>
-            <div id="votebutton6" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 6)"></div>
-            <div id="votebutton7" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 7)"></div>
-            <div id="votebutton8" class="vote-button" value="Test" ontouchStart="window.app.sendMessageToScreen('vote', 8)"></div>
+            <div id="votebutton0" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 0)"></div>
+            <div id="votebutton1" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 1)"></div>
+            <div id="votebutton2" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 2)"></div>
+            <div id="votebutton3" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 3)"></div>
+            <div id="votebutton4" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 4)"></div>
+            <div id="votebutton5" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 5)"></div>
+            <div id="votebutton6" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 6)"></div>
+            <div id="votebutton7" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 7)"></div>
+            <div id="votebutton8" class="vote-button" ontouchStart="window.app.sendMessageToScreen('vote', 8)"></div>
         </div>       
     </body>
 </html>

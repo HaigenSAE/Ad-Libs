@@ -25,6 +25,7 @@ public class GameLogic : MonoBehaviour
     int typewriterCounter;
     int numPlayers;
     int firstConnectedID;
+    int votesCount;
 
     private AirConsole airConsole;
     private bool isStarted;
@@ -179,7 +180,17 @@ public class GameLogic : MonoBehaviour
             {
                 promptAnswers.Add(fromDeviceID, new List<string> { data["result"].ToString() });
             }
-            if(promptAnswers.Keys.Count == numPlayers)
+
+            if (promptAnswers[fromDeviceID].Count == 1)
+            {
+                AirConsole.instance.Message(fromDeviceID, pfillerStrings[Random.Range(0, pfillerStrings.Count - 1)]);
+            }
+            else
+            {
+                AirConsole.instance.Message(fromDeviceID, poutroStrings[Random.Range(0, poutroStrings.Count - 1)]);
+            }
+
+            if (promptAnswers.Keys.Count == numPlayers)
             {
                 if(promptAnswers.Values.Sum(list => list.Count) == numPlayers * 3)
                 {
@@ -196,7 +207,26 @@ public class GameLogic : MonoBehaviour
         {
             AirConsole.instance.Broadcast("StartGame");
         }
-        
+        else if(data["vote"] != null && data["vote"].ToString() != "")
+        {
+            votesCount++;
+            votingCards[data["vote"].ToObject<int>()].GetComponent<VoteCard>().votes += 1;
+            if (votesCount == numPlayers)
+            {
+                votesCount = 0;
+                GameObject go = votingCards.OrderByDescending(votingCards => votingCards.GetComponent<VoteCard>().votes).First();
+                Debug.Log(go.GetComponentInChildren<Text>().text);
+                string replace = myText.text.Replace("____", go.GetComponentInChildren<Text>().text);
+                myText.text = replace;
+                MoveForward();
+                for(int i = 0; i < votingCards.Count; i++)
+                {
+                    GameObject.Destroy(votingCards[i]);
+                }
+                votingCards.Clear();
+            }
+        }
+
     }
 
     private void OnDestroy()
